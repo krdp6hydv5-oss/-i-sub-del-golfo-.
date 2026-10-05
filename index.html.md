@@ -1,0 +1,545 @@
+<!DOCTYPE html>  
+<html lang="it">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+  <title>I Sub del Golfo</title>  
+  <style>  
+    :root {  
+      --primary: #0284c7;  
+      --primary-dark: #0369a1;  
+      --primary-light: #e0f2fe;  
+      --accent: #10b981;  
+      --bg: #f8fafc;  
+      --surface: #ffffff;  
+      --text: #0f172a;  
+      --text-muted: #64748b;  
+      --border: #e2e8f0;  
+      --radius: 16px;  
+      --shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -4px rgba(0,0,0,0.05);  
+    }  
+  
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }  
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }  
+  
+    /* Header Top Bar */  
+    .header {  
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);  
+      color: white;  
+      padding: 16px 20px;  
+      position: sticky;  
+      top: 0;  
+      z-index: 100;  
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);  
+      display: flex;  
+      align-items: center;  
+      justify-content: space-between;  
+    }  
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; }  
+    .brand-icon { font-size: 1.4rem; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 10px; }  
+  
+    /* Layout Pagine */  
+    .page { display: none; padding: 16px; max-width: 650px; margin: 0 auto; animation: fadeIn 0.2s ease-in-out; }  
+    .page.active { display: block; }  
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }  
+  
+    .page-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 14px; }  
+  
+    /* Card & Banner Copertina */  
+    .card {  
+      background: var(--surface);  
+      border-radius: var(--radius);  
+      padding: 18px;  
+      margin-bottom: 16px;  
+      box-shadow: var(--shadow);  
+      border: 1px solid var(--border);  
+    }  
+  
+    .hero-image-container {  
+      position: relative;  
+      width: 100%;  
+      height: 220px;  
+      border-radius: var(--radius);  
+      overflow: hidden;  
+      margin-bottom: 16px;  
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);  
+      display: flex;  
+      align-items: center;  
+      justify-content: center;  
+      cursor: pointer;  
+      box-shadow: var(--shadow);  
+    }  
+  
+    .hero-image-container img {  
+      width: 100%;  
+      height: 100%;  
+      object-fit: cover;  
+    }  
+  
+    .hero-upload-btn {  
+      position: absolute;  
+      bottom: 12px;  
+      right: 12px;  
+      background: rgba(0, 0, 0, 0.65);  
+      color: white;  
+      padding: 8px 14px;  
+      border-radius: 20px;  
+      font-size: 0.85rem;  
+      font-weight: 600;  
+      backdrop-filter: blur(4px);  
+      border: 1px solid rgba(255, 255, 255, 0.2);  
+      display: flex;  
+      align-items: center;  
+      gap: 6px;  
+    }  
+  
+    .hero-placeholder-text {  
+      color: white;  
+      text-align: center;  
+      padding: 16px;  
+      font-weight: 600;  
+      display: flex;  
+      flex-direction: column;  
+      align-items: center;  
+      gap: 8px;  
+    }  
+  
+    /* Finestra Interattiva Specie */  
+    .interactive-card {  
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);  
+      border: 1px solid #7dd3fc;  
+      border-radius: var(--radius);  
+      padding: 18px;  
+      margin-bottom: 16px;  
+      cursor: pointer;  
+      transition: transform 0.2s ease;  
+    }  
+    .interactive-card:active { transform: scale(0.98); }  
+  
+    /* Lista Specie & Link Wikipedia */  
+    .search-box {  
+      width: 100%;  
+      padding: 12px;  
+      border-radius: 12px;  
+      border: 1px solid var(--border);  
+      margin-bottom: 14px;  
+      font-size: 0.95rem;  
+      outline: none;  
+    }  
+  
+    .species-grid { display: flex; flex-direction: column; gap: 10px; }  
+    .species-item {  
+      display: flex;  
+      align-items: center;  
+      justify-content: space-between;  
+      background: var(--surface);  
+      padding: 12px 16px;  
+      border-radius: 12px;  
+      border: 1px solid var(--border);  
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);  
+    }  
+    .species-info { display: flex; flex-direction: column; gap: 4px; }  
+    .species-name { font-weight: 700; font-size: 0.98rem; color: #1e293b; }  
+    .wiki-link {  
+      font-size: 0.8rem;  
+      color: #0284c7;  
+      text-decoration: none;  
+      font-weight: 600;  
+      display: inline-flex;  
+      align-items: center;  
+      gap: 4px;  
+    }  
+    .wiki-link:hover { text-decoration: underline; }  
+  
+    .seen-btn {  
+      background: #f1f5f9;  
+      border: 1px solid #cbd5e1;  
+      padding: 6px 14px;  
+      border-radius: 20px;  
+      font-weight: 700;  
+      font-size: 0.8rem;  
+      color: #475569;  
+      cursor: pointer;  
+    }  
+    .seen-btn.seen { background: #dcfce7; border-color: #86efac; color: #15803d; }  
+  
+    /* Form & Controlli */  
+    label { display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-top: 10px; margin-bottom: 4px; }  
+    input, textarea {  
+      width: 100%;  
+      padding: 12px;  
+      border: 1px solid var(--border);  
+      border-radius: 10px;  
+      font-size: 0.95rem;  
+      background: #f8fafc;  
+      outline: none;  
+    }  
+    button.submit-btn {  
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);  
+      color: white;  
+      border: none;  
+      padding: 12px;  
+      border-radius: 10px;  
+      width: 100%;  
+      font-size: 1rem;  
+      font-weight: 700;  
+      cursor: pointer;  
+      margin-top: 14px;  
+    }  
+  
+    /* Media Gallery Grid */  
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 14px; }  
+    .media-item { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }  
+  
+    /* Bottom Navigation Bar */  
+    .bottom-nav {  
+      position: fixed;  
+      bottom: 0; left: 0; right: 0;  
+      background: rgba(255, 255, 255, 0.95);  
+      backdrop-filter: blur(10px);  
+      display: flex;  
+      justify-content: space-around;  
+      padding: 8px 0 12px 0;  
+      border-top: 1px solid var(--border);  
+      z-index: 1000;  
+    }  
+    .nav-btn {  
+      background: none;  
+      border: none;  
+      display: flex;  
+      flex-direction: column;  
+      align-items: center;  
+      color: #94a3b8;  
+      font-size: 0.7rem;  
+      font-weight: 600;  
+      flex: 1;  
+      cursor: pointer;  
+    }  
+    .nav-btn.active { color: var(--primary); font-weight: 800; }  
+    .nav-icon { font-size: 1.3rem; margin-bottom: 2px; }  
+  </style>  
+</head>  
+<body>  
+  
+  <!-- Top Bar -->  
+  <header class="header">  
+    <div class="brand">  
+      <span class="brand-icon">🤿</span>  
+      <span>I Sub del Golfo</span>  
+    </div>  
+  </header>  
+  
+  <!-- Pagina Home -->  
+  <main id="home" class="page active">  
+      
+    <!-- Copertina Personalizzabile dalla Galleria -->  
+    <div class="hero-image-container" onclick="document.getElementById('hero-file-input').click()">  
+      <img id="hero-banner-img" src="" alt="Copertina" style="display: none;">  
+      <div id="hero-placeholder" class="hero-placeholder-text">  
+        <span style="font-size: 2.2rem;">📸</span>  
+        <span>Premi qui per scegliere la tua foto di copertina</span>  
+      </div>  
+      <div class="hero-upload-btn">  
+        📷 <span>Cambia Foto</span>  
+      </div>  
+    </div>  
+    <input type="file" id="hero-file-input" accept="image/*" style="display: none" onchange="handleHeroImageUpload(event)">  
+  
+    <!-- Finestra Interattiva per Specie -->  
+    <div class="interactive-card" onclick="showPage('guide')">  
+      <h3 style="color:#0369a1; font-size:1.1rem; margin-bottom:4px;">🐟 Guida e Archivio Specie</h3>  
+      <p style="color:#0369a1; font-size:0.88rem;">  
+        Clicca qui per aprire il catalogo completo di tutte le specie con scheda informativa e link diretti a Wikipedia!  
+      </p>  
+    </div>  
+  
+    <div class="card">  
+      <h3>Benvenuti a Bordo</h3>  
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-top:4px;">  
+        Esplora la biodiversità marina del golfo, spunta le specie avvistate, carica foto e video ed annota le tue immersioni nel diario di bordo.  
+      </p>  
+    </div>  
+  </main>  
+  
+  <!-- Pagina Specie -->  
+  <main id="guide" class="page">  
+    <h2 class="page-title">Specie Marine & Wikipedia</h2>  
+    <input type="text" id="search-input" class="search-box" placeholder="Cerca specie..." onkeyup="filterSpecies()">  
+    <div id="species-container" class="species-grid"></div>  
+  </main>  
+  
+  <!-- Pagina Media (Foto & Video) -->  
+  <main id="media" class="page">  
+    <h2 class="page-title">Galleria Foto & Video</h2>  
+    <div class="card">  
+      <h3>Carica Contenuto</h3>  
+      <label for="media-input">Seleziona foto o video</label>  
+      <input type="file" id="media-input" accept="image/*,video/*">  
+      <button class="submit-btn" onclick="uploadMedia()">Aggiungi alla Galleria</button>  
+    </div>  
+    <div id="media-gallery" class="media-grid"></div>  
+  </main>  
+  
+  <!-- Pagina Diario di Bordo -->  
+  <main id="logbook" class="page">  
+    <h2 class="page-title">Diario di Bordo</h2>  
+    <div class="card">  
+      <h3>Nuova Nota d'Immersione</h3>  
+      <form id="dive-form">  
+        <label for="dive-title">Titolo / Punto di Immersione</label>  
+        <input type="text" id="dive-title" placeholder="Es. Secca del Faro" required>  
+  
+        <label for="dive-date">Data</label>  
+        <input type="date" id="dive-date" required>  
+  
+        <label for="dive-notes">Testo Personalizzato Diario</label>  
+        <textarea id="dive-notes" rows="4" placeholder="Scrivi qui i dettagli dell'immersione, condizioni meteo, attrezzatura..." required></textarea>  
+  
+        <button type="submit" class="submit-btn">Salva Nota</button>  
+      </form>  
+    </div>  
+  
+    <h3 style="margin: 20px 0 10px 0;">Note Salvate</h3>  
+    <div id="log-list"></div>  
+  </main>  
+  
+  <!-- Navigation Bar Inferiore -->  
+  <nav class="bottom-nav">  
+    <button class="nav-btn active" id="btn-home" onclick="showPage('home')">  
+      <span class="nav-icon">🏠</span>  
+      <span>Home</span>  
+    </button>  
+    <button class="nav-btn" id="btn-guide" onclick="showPage('guide')">  
+      <span class="nav-icon">🐟</span>  
+      <span>Specie</span>  
+    </button>  
+    <button class="nav-btn" id="btn-media" onclick="showPage('media')">  
+      <span class="nav-icon">📷</span>  
+      <span>Foto/Video</span>  
+    </button>  
+    <button class="nav-btn" id="btn-logbook" onclick="showPage('logbook')">  
+      <span class="nav-icon">📖</span>  
+      <span>Diario</span>  
+    </button>  
+  </nav>  
+  
+  <script>  
+    // Lista Specie  
+    const rawSpeciesList = [  
+      "Aguglia", "Aragosta", "Bavosa", "Bavosa bianca", "Bavosa cornuta", "Bavosa gialla",  
+      "Barracuda", "Boga", "Berta minore", "Cappone gallinella", "Caretta caretta", "Castagnola",  
+      "Castagnola rossa", "Cavalluccio marino", "Cefalo", "Cernia bruna", "Cernia rossa", "Cepola",  
+      "Civetta di mare", "Coccinella di mare", "Cormorano", "Corvina", "Delfino", "Donzella",  
+      "Donzella pavonina", "Edredone", "Flabellina affinis", "Gabbiano reale", "Gallinella", "Ghiozzo",  
+      "Ghiozzo di Bucchich", "Ghiozzo rigato", "Gorgonia rossa", "Granchio eremita", "Granchio reale blu",  
+      "Grongo", "Hypselodoris valenciennesi", "Lampuga", "Leccia", "Lepre di mare", "Latterino",  
+      "Mako", "Margherita di mare", "Medusa luminosa", "Mormora", "Mostella", "Murena", "Nasello",  
+      "Occhiata", "Pagello bastardo", "Pagello fragolino", "Pagro", "Palamita", "Pesce balestra",  
+      "Pesce civetta", "Pesce peperoncino", "Pesce serra", "Perchia", "Polpo", "Pomodoro di mare",  
+      "Polmone di mare", "Rana pescatrice", "Razza", "Re di triglie", "Ricciola", "Rombo",  
+      "Rombo di rena", "Salpa", "Sarago fasciato", "Sarago maggiore", "Sarago pizzuto", "Scorfano nero",  
+      "Scorfano rosso", "Scorfanotto", "Seppia", "Sogliola", "Spigola", "Tanuta", "Torpedine",  
+      "Tordo fischietto", "Tordo grigio", "Tordo mediterraneo", "Tordo musolungo", "Tordo nero",  
+      "Tordo ocellato", "Tordo pavone", "Tordo verde", "Triglia di fango", "Triglia di scoglio",  
+      "Vacchetta di mare", "Verdesca", "Verme dal ciuffo bianco", "Zerro"  
+    ];  
+  
+    document.addEventListener('DOMContentLoaded', () => {  
+      loadHeroImage();  
+      renderSpecies();  
+      renderMedia();  
+      renderLogs();  
+    });  
+  
+    // Gestione Foto Copertina Personalizzata  
+    function loadHeroImage() {  
+      const savedImg = localStorage.getItem('sub_golfo_hero_image');  
+      const imgElem = document.getElementById('hero-banner-img');  
+      const placeholderElem = document.getElementById('hero-placeholder');  
+  
+      if (savedImg) {  
+        imgElem.src = savedImg;  
+        imgElem.style.display = 'block';  
+        if (placeholderElem) placeholderElem.style.display = 'none';  
+      } else {  
+        imgElem.style.display = 'none';  
+        if (placeholderElem) placeholderElem.style.display = 'flex';  
+      }  
+    }  
+  
+    function handleHeroImageUpload(event) {  
+      const file = event.target.files[0];  
+      if (!file) return;  
+  
+      const reader = new FileReader();  
+      reader.onload = function(e) {  
+        const img = new Image();  
+        img.onload = function() {  
+          const canvas = document.createElement('canvas');  
+          const maxW = 1000;  
+          let w = img.width;  
+          let h = img.height;  
+  
+          if (w > maxW) {  
+            h = Math.round((h * maxW) / w);  
+            w = maxW;  
+          }  
+  
+          canvas.width = w;  
+          canvas.height = h;  
+  
+          const ctx = canvas.getContext('2d');  
+          ctx.drawImage(img, 0, 0, w, h);  
+  
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);  
+  
+          try {  
+            localStorage.setItem('sub_golfo_hero_image', compressedDataUrl);  
+            loadHeroImage();  
+          } catch (err) {  
+            alert("L'immagine è troppo grande, prova a sceglierne un'altra.");  
+          }  
+        };  
+        img.src = e.target.result;  
+      };  
+      reader.readAsDataURL(file);  
+    }  
+  
+    // Navigazione Pagine  
+    function showPage(pageId) {  
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));  
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));  
+  
+      const targetPage = document.getElementById(pageId);  
+      const targetBtn = document.getElementById('btn-' + pageId);  
+  
+      if (targetPage) targetPage.classList.add('active');  
+      if (targetBtn) targetBtn.classList.add('active');  
+  
+      window.scrollTo({ top: 0, behavior: 'smooth' });  
+    }  
+  
+    // Render Lista Specie con Link Wikipedia  
+    function renderSpecies() {  
+      const container = document.getElementById('species-container');  
+      if (!container) return;  
+  
+      let seenData = {};  
+      try { seenData = JSON.parse(localStorage.getItem('seen_species_v2')) || {}; } catch(e) {}  
+  
+      container.innerHTML = rawSpeciesList.map(name => {  
+        const isSeen = !!seenData[name];  
+        const wikiUrl = `https://it.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(name)}`;  
+        return `  
+          <div class="species-item" data-name="${name.toLowerCase()}">  
+            <div class="species-info">  
+              <span class="species-name">${name}</span>  
+              <a href="${wikiUrl}" target="_blank" class="wiki-link">📖 Leggi su Wikipedia ↗</a>  
+            </div>  
+            <button class="seen-btn ${isSeen ? 'seen' : ''}" onclick="toggleSeen('${name}')">  
+              ${isSeen ? '✓ Visto' : '+ Visto'}  
+            </button>  
+          </div>  
+        `;  
+      }).join('');  
+    }  
+  
+    function toggleSeen(name) {  
+      let seenData = {};  
+      try { seenData = JSON.parse(localStorage.getItem('seen_species_v2')) || {}; } catch(e) {}  
+      seenData[name] = !seenData[name];  
+      localStorage.setItem('seen_species_v2', JSON.stringify(seenData));  
+      renderSpecies();  
+    }  
+  
+    function filterSpecies() {  
+      const query = document.getElementById('search-input').value.toLowerCase();  
+      document.querySelectorAll('.species-item').forEach(item => {  
+        const name = item.getAttribute('data-name');  
+        item.style.display = name.includes(query) ? 'flex' : 'none';  
+      });  
+    }  
+  
+    // Gestione Caricamento Foto e Video Galleria  
+    function uploadMedia() {  
+      const input = document.getElementById('media-input');  
+      if (!input.files || !input.files[0]) return;  
+  
+      const file = input.files[0];  
+      const reader = new FileReader();  
+  
+      reader.onload = function(e) {  
+        const mediaList = JSON.parse(localStorage.getItem('app_media') || '[]');  
+        mediaList.unshift({ type: file.type.startsWith('video') ? 'video' : 'image', src: e.target.result });  
+        try {  
+          localStorage.setItem('app_media', JSON.stringify(mediaList));  
+          renderMedia();  
+          input.value = '';  
+        } catch(err) {  
+          alert('Spazio di archiviazione locale pieno. Rimuovi qualche file.');  
+        }  
+      };  
+      reader.readAsDataURL(file);  
+    }  
+  
+    function renderMedia() {  
+      const gallery = document.getElementById('media-gallery');  
+      if (!gallery) return;  
+  
+      const mediaList = JSON.parse(localStorage.getItem('app_media') || '[]');  
+      if (mediaList.length === 0) {  
+        gallery.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Nessun file multimediale inserito.</p>';  
+        return;  
+      }  
+  
+      gallery.innerHTML = mediaList.map(m => {  
+        return m.type === 'video'  
+          ? `<video class="media-item" src="${m.src}" controls></video>`  
+          : `<img class="media-item" src="${m.src}" alt="Media">`;  
+      }).join('');  
+    }  
+  
+    // Gestione Diario di Bordo  
+    const diveForm = document.getElementById('dive-form');  
+    if (diveForm) {  
+      diveForm.addEventListener('submit', function(e) {  
+        e.preventDefault();  
+          
+        const title = document.getElementById('dive-title').value;  
+        const date = document.getElementById('dive-date').value;  
+        const notes = document.getElementById('dive-notes').value;  
+  
+        let logs = [];  
+        try { logs = JSON.parse(localStorage.getItem('app_logs')) || []; } catch(e) {}  
+  
+        logs.unshift({ title, date, notes });  
+        localStorage.setItem('app_logs', JSON.stringify(logs));  
+  
+        this.reset();  
+        renderLogs();  
+      });  
+    }  
+  
+    function renderLogs() {  
+      const logEl = document.getElementById('log-list');  
+      if (!logEl) return;  
+  
+      let logs = [];  
+      try { logs = JSON.parse(localStorage.getItem('app_logs')) || []; } catch(e) {}  
+  
+      if (logs.length === 0) {  
+        logEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Nessuna nota presente nel diario.</p>';  
+        return;  
+      }  
+  
+      logEl.innerHTML = logs.map(l => `  
+        <div class="card">  
+          <h3>${l.title}</h3>  
+          <p style="font-size:0.8rem; color:var(--primary-dark); font-weight:700; margin: 4px 0 8px 0;">📅 ${l.date}</p>  
+          <p style="white-space: pre-wrap;">${l.notes}</p>  
+        </div>  
+      `).join('');  
+    }  
+  </script>  
+</body>  
+</html>  
