@@ -31,7 +31,7 @@
       overflow-x: hidden;
     }
 
-    /* SFONDO ANIMATO CON BOLLE E ADESIVI MARINI */
+    /* SOLO BOLLE ANIMATE DI SFONDO */
     .bubbles-container {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -60,19 +60,6 @@
       20% { opacity: 0.8; }
       100% { bottom: 100vh; transform: translateX(30px); opacity: 0; }
     }
-
-    .sea-sticker {
-      position: fixed;
-      font-size: 2.2rem;
-      opacity: 0.18;
-      pointer-events: none;
-      z-index: 0;
-      user-select: none;
-    }
-    .sticker-1 { top: 12%; left: 4%; transform: rotate(-15deg); }
-    .sticker-2 { top: 35%; right: 5%; transform: rotate(20deg); }
-    .sticker-3 { top: 60%; left: 3%; transform: rotate(10deg); }
-    .sticker-4 { top: 82%; right: 4%; transform: rotate(-25deg); }
 
     /* Header */
     .header {
@@ -122,7 +109,7 @@
 
     /* Cards */
     .card { 
-      background: rgba(255, 255, 255, 0.92); 
+      background: rgba(255, 255, 255, 0.95); 
       backdrop-filter: blur(8px);
       border-radius: var(--radius); 
       padding: 18px; 
@@ -148,7 +135,6 @@
       padding: 24px; background: linear-gradient(180deg, #e0f2fe 0%, #ffffff 100%);
       border-radius: 24px; border: 3px dashed #0284c7; box-shadow: var(--shadow); margin: 20px 0;
     }
-    .marine-silhouettes { display: flex; justify-content: space-between; width: 100%; max-width: 280px; font-size: 1.5rem; opacity: 0.8; margin: 8px 0; }
     .qr-box { background: white; padding: 14px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 2px solid #38bdf8; }
     .qr-box img { width: 200px; height: 200px; display: block; border-radius: 8px; }
 
@@ -175,7 +161,7 @@
       border-radius: 10px; width: 100%; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 14px;
     }
 
-    /* Layout Scheda Specie con Foto */
+    /* Layout Scheda Specie con Foto Reali */
     .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; font-size: 0.95rem; }
     .species-grid { display: flex; flex-direction: column; gap: 12px; }
     
@@ -183,23 +169,23 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.98);
       padding: 10px 14px;
       border-radius: 14px;
       border: 1px solid var(--border);
       box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-      gap: 10px;
+      gap: 12px;
     }
+    .species-thumb-container {
+      width: 60px; height: 60px; border-radius: 10px; overflow: hidden;
+      background: #e2e8f0; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; border: 1px solid #cbd5e1;
+    }
+    .species-thumb-container img { width: 100%; height: 100%; object-fit: cover; }
+    
     .species-info { display: flex; flex-direction: column; flex: 1; }
     .species-title { font-weight: 700; font-size: 0.95rem; color: #0f172a; }
     .species-wiki-link { font-size: 0.78rem; color: var(--primary); text-decoration: none; margin-top: 4px; font-weight: 600; }
-    
-    .species-thumb-container {
-      width: 55px; height: 55px; border-radius: 10px; overflow: hidden;
-      background: var(--primary-light); display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; border: 1px solid #cbd5e1; font-size: 1.5rem;
-    }
-    .species-thumb-container img { width: 100%; height: 100%; object-fit: cover; }
 
     .seen-btn {
       background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px;
@@ -209,7 +195,7 @@
 
     /* Bottom Nav */
     .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95);
+      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 8px 0 12px 0;
       border-top: 1px solid var(--border); z-index: 1000;
     }
@@ -220,7 +206,7 @@
 </head>
 <body>
 
-  <!-- ELEMENTI GRAFICI DI SFONDO (BOLLE E ADESIVI) -->
+  <!-- SOLO BOLLE D'ARIA NEL SFONDO -->
   <div class="bubbles-container">
     <div class="bubble"></div>
     <div class="bubble"></div>
@@ -228,10 +214,6 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
   </div>
-  <div class="sea-sticker sticker-1">🪸</div>
-  <div class="sea-sticker sticker-2">⭐</div>
-  <div class="sea-sticker sticker-3">🐚</div>
-  <div class="sea-sticker sticker-4">🐙</div>
 
   <!-- MENU LATERALE OVERLAY -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
@@ -300,14 +282,8 @@
       </p>
 
       <div class="qr-frame-container">
-        <div class="marine-silhouettes">
-          <span>🐢</span><span>🐬</span><span>🐟</span><span>🐙</span><span>🦈</span>
-        </div>
         <div class="qr-box">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://krdp6hydv5-oss.github.io/i-sub-del-golfo/" alt="QR Code Y&C I Sub del Golfo">
-        </div>
-        <div class="marine-silhouettes">
-          <span>🦈</span><span>🐙</span><span>🐟</span><span>🐬</span><span>🐢</span>
         </div>
       </div>
     </div>
@@ -362,7 +338,7 @@
     </div>
   </main>
 
-  <!-- SPECIE MARINE CON FOTO D'ANTEPRIMA -->
+  <!-- SPECIE MARINE CON FOTO REALI DA WIKIPEDIA -->
   <main id="guide" class="page">
     <h2 class="page-title">🐟 Specie Marine & Wikipedia</h2>
     <input type="text" id="search-input" class="search-box" placeholder="Cerca specie..." onkeyup="filterSpecies()">
@@ -539,6 +515,23 @@
       renderProfiles();
     }
 
+    /* FUNZIONE PER FETCH FOTO REALI DA WIKIPEDIA */
+    async function loadWikiImage(name, imgId) {
+      try {
+        const url = `https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.thumbnail && data.thumbnail.source) {
+            const imgEl = document.getElementById(imgId);
+            if (imgEl) imgEl.src = data.thumbnail.source;
+          }
+        }
+      } catch (e) {
+        console.log('Img not found for', name);
+      }
+    }
+
     function renderSpecies() {
       const container = document.getElementById('species-container');
       if (!container) return;
@@ -547,16 +540,20 @@
       container.innerHTML = rawSpeciesList.map((name, idx) => {
         const isSeen = !!seenData[name];
         const wikiUrl = `https://it.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(name)}`;
+        const imgId = `species-img-${idx}`;
+
+        // Avvia il caricamento dell'immagine da Wikipedia
+        loadWikiImage(name, imgId);
 
         return `
           <div class="species-card" data-name="${name.toLowerCase()}">
+            <div class="species-thumb-container">
+              <img id="${imgId}" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Fish_icon.svg" alt="${name}" onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/e/e0/Fish_icon.svg';">
+            </div>
+
             <div class="species-info">
               <span class="species-title">${name}</span>
               <a href="${wikiUrl}" target="_blank" class="species-wiki-link">📖 Wikipedia ↗</a>
-            </div>
-
-            <div class="species-thumb-container">
-              🐟
             </div>
 
             <button class="seen-btn ${isSeen ? 'seen' : ''}" onclick="toggleSeen(${idx})">
