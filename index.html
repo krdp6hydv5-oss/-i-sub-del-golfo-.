@@ -1,192 +1,602 @@
-<!DOCTYPE html>  
-<html lang="it">  
-<head>  
-  <meta charset="UTF-8">  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-  <title>Y&C - I Sub del Golfo</title>  
-  <style>  
-    :root {  
-      --primary: #0284c7;  
-      --primary-dark: #0369a1;  
-      --primary-light: #e0f2fe;  
-      --danger: #ef4444;  
-      --danger-dark: #dc2626;  
-      --bg: #f8fafc;  
-      --surface: #ffffff;  
-      --text: #0f172a;  
-      --text-muted: #64748b;  
-      --border: #e2e8f0;  
-      --radius: 16px;  
-      --shadow: 0 10px 15px -3px rgba(0,0,0,0.05);  
-    }  
-  
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }  
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; overflow-x: hidden; }  
-  
-    /* Header & Side Menu */  
-    .header {  
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);  
-      color: white;  
-      padding: 16px 20px;  
-      position: sticky;  
-      top: 0;  
-      z-index: 100;  
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);  
-      display: flex;  
-      align-items: center;  
-      justify-content: space-between;  
-    }  
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; }  
-    .menu-toggle { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 4px; }  
-  
-    /* Drawer / Side Menu */  
-    .drawer-overlay {  
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;  
-      background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);  
-      z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;  
-    }  
-    .drawer-overlay.active { opacity: 1; visibility: visible; }  
-  
-    .drawer {  
-      position: fixed; top: 0; left: -280px; width: 280px; height: 100%;  
-      background: var(--surface); z-index: 1001; transition: left 0.3s ease;  
-      display: flex; flex-direction: column; box-shadow: 5px 0 25px rgba(0,0,0,0.15);  
-    }  
-    .drawer.active { left: 0; }  
-    .drawer-header {  
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);  
-      color: white; padding: 24px 20px; font-weight: 800; font-size: 1.2rem;  
-    }  
-    .drawer-menu { list-style: none; padding: 12px 0; overflow-y: auto; flex: 1; }  
-    .drawer-item {  
-      padding: 14px 20px; display: flex; align-items: center; gap: 12px;  
-      color: var(--text); font-weight: 600; text-decoration: none; cursor: pointer; border-bottom: 1px solid #f1f5f9;  
-    }  
-    .drawer-item:hover, .drawer-item.active { background: var(--primary-light); color: var(--primary-dark); }  
-  
-    /* Pages */  
-    .page { display: none; padding: 16px; max-width: 650px; margin: 0 auto; animation: fadeIn 0.2s ease-in-out; position: relative; z-index: 2; }  
-    .page.active { display: block; }  
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }  
-    .page-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 14px; }  
-  
-    /* Cards */  
-    .card { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }  
-      
-    .hero-image-container {  
-      position: relative; width: 100%; height: 220px; border-radius: var(--radius);  
-      overflow: hidden; margin-bottom: 16px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);  
-      display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow);  
-    }  
-    .hero-image-container img { width: 100%; height: 100%; object-fit: cover; }  
-    .hero-upload-btn {  
-      position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.65); color: white;  
-      padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; backdrop-filter: blur(4px);  
-    }  
-  
-    /* Animazioni Sfondo Home: Bolle e Creature */  
-    #ocean-animation-container {  
-      position: fixed;  
-      top: 0; left: 0; width: 100vw; height: 100vh;  
-      pointer-events: none;  
-      z-index: 1;  
-      overflow: hidden;  
-      display: none;  
-    }  
-  
-    .bubble {  
-      position: absolute;  
-      bottom: -30px;  
-      background: rgba(2, 132, 199, 0.15);  
-      border: 1px solid rgba(255, 255, 255, 0.6);  
-      border-radius: 50%;  
-      animation: floatUp linear forwards;  
-    }  
-  
-    @keyframes floatUp {  
-      0% { transform: translateY(0) scale(0.8); opacity: 0.8; }  
-      100% { transform: translateY(-105vh) scale(1.2); opacity: 0; }  
-    }  
-  
-    .swimming-creature {  
-      position: absolute;  
-      top: 40%;  
-      left: -150px;  
-      font-size: 4rem;  
-      opacity: 0.35;  
-      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));  
-      white-space: nowrap;  
-      pointer-events: none;  
-    }  
-  
-    @keyframes swimRight {  
-      0% { left: -180px; transform: translateY(0) scaleX(-1); }  
-      50% { transform: translateY(-20px) scaleX(-1); }  
-      100% { left: 110vw; transform: translateY(0) scaleX(-1); }  
-    }  
-  
-    /* Cornice QR Code con Ombre Marine */  
-    .qr-frame-container {  
-      display: flex;  
-      flex-direction: column;  
-      align-items: center;  
-      justify-content: center;  
-      padding: 24px;  
-      background: linear-gradient(180deg, #e0f2fe 0%, #ffffff 100%);  
-      border-radius: 24px;  
-      border: 4px dashed #0284c7;  
-      box-shadow: var(--shadow);  
-      margin: 20px 0;  
-    }  
-  
-    .marine-silhouettes {  
-      display: flex;  
-      justify-content: space-between;  
-      width: 100%;  
-      max-width: 320px;  
-      font-size: 1.5rem;  
-      color: #0369a1;  
-      opacity: 0.7;  
-      margin: 8px 0;  
-    }  
-  
-    .qr-box {  
-      background: white;  
-      padding: 16px;  
-      border-radius: 16px;  
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);  
-      border: 2px solid #38bdf8;  
-    }  
-  
-    .qr-box img {  
-      width: 220px;  
-      height: 220px;  
-      display: block;  
-      border-radius: 8px;  
-    }  
-  
-    /* Primary Action Cards */  
-    .action-card-danger {  
-      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);  
-      border: 1px solid #fca5a5; border-radius: var(--radius); padding: 18px; margin-bottom: 16px; cursor: pointer;  
-    }  
-    .action-card-danger h3 { color: var(--danger-dark); }  
-  
-    .sos-btn {  
-      background: var(--danger); color: white; border: none; padding: 12px; border-radius: 12px;  
-      font-weight: 800; font-size: 1rem; width: 100%; display: flex; align-items: center; justify-content: center;  
-      gap: 8px; text-decoration: none; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);  
-    }  
-  
-    /* Forms */  
-    label { display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-top: 10px; margin-bottom: 4px; }  
-    input, textarea, select {  
-      width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: #f8fafc; outline: none;  
-    }  
-    button.submit-btn {  
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none; padding: 12px;  
-      border-radius: 10px; width: 100%; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 14px;  
-    }  
-  
-    /* Card Specie */  
-    .search-box { width: 100%; padding: 12px; border-radius: 12  
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Y&C - I Sub del Golfo</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --primary-light: #e0f2fe;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --bg: #f0f9ff;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #bae6fd;
+      --radius: 16px;
+      --shadow: 0 10px 15px -3px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    body { 
+      background-color: var(--bg); 
+      color: var(--text); 
+      padding-bottom: 90px;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* SFONDO ANIMATO CON BOLLE E ADESIVI MARINI */
+    .bubbles-container {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -50px;
+      background: rgba(56, 189, 248, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      animation: rise 10s infinite ease-in;
+    }
+
+    .bubble:nth-child(1) { width: 40px; height: 40px; left: 10%; animation-duration: 8s; animation-delay: 0s; }
+    .bubble:nth-child(2) { width: 20px; height: 20px; left: 30%; animation-duration: 5s; animation-delay: 1s; }
+    .bubble:nth-child(3) { width: 50px; height: 50px; left: 50%; animation-duration: 12s; animation-delay: 2s; }
+    .bubble:nth-child(4) { width: 25px; height: 25px; left: 75%; animation-duration: 7s; animation-delay: 0.5s; }
+    .bubble:nth-child(5) { width: 35px; height: 35px; left: 90%; animation-duration: 9s; animation-delay: 3s; }
+
+    @keyframes rise {
+      0% { bottom: -50px; transform: translateX(0); opacity: 0; }
+      20% { opacity: 0.8; }
+      100% { bottom: 100vh; transform: translateX(30px); opacity: 0; }
+    }
+
+    .sea-sticker {
+      position: fixed;
+      font-size: 2.2rem;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+    }
+    .sticker-1 { top: 12%; left: 4%; transform: rotate(-15deg); }
+    .sticker-2 { top: 35%; right: 5%; transform: rotate(20deg); }
+    .sticker-3 { top: 60%; left: 3%; transform: rotate(10deg); }
+    .sticker-4 { top: 82%; right: 4%; transform: rotate(-25deg); }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; }
+    .menu-toggle { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 4px; }
+
+    /* Drawer / Side Menu */
+    .drawer-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);
+      z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .drawer-overlay.active { opacity: 1; visibility: visible; }
+
+    .drawer {
+      position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+      background: var(--surface); z-index: 1001; transition: left 0.3s ease;
+      display: flex; flex-direction: column; box-shadow: 5px 0 25px rgba(0,0,0,0.15);
+    }
+    .drawer.active { left: 0; }
+    .drawer-header {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white; padding: 24px 20px; font-weight: 800; font-size: 1.2rem;
+    }
+    .drawer-menu { list-style: none; padding: 12px 0; overflow-y: auto; flex: 1; }
+    .drawer-item {
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      color: var(--text); font-weight: 600; text-decoration: none; cursor: pointer; border-bottom: 1px solid #f1f5f9;
+    }
+    .drawer-item:hover, .drawer-item.active { background: var(--primary-light); color: var(--primary-dark); }
+
+    /* Pages */
+    .page { display: none; padding: 16px; max-width: 650px; margin: 0 auto; position: relative; z-index: 1; }
+    .page.active { display: block; }
+    .page-title { font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 14px; }
+
+    /* Cards */
+    .card { 
+      background: rgba(255, 255, 255, 0.92); 
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius); 
+      padding: 18px; 
+      margin-bottom: 16px; 
+      box-shadow: var(--shadow); 
+      border: 1px solid var(--border); 
+    }
+    
+    .hero-image-container {
+      position: relative; width: 100%; height: 200px; border-radius: var(--radius);
+      overflow: hidden; margin-bottom: 16px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow);
+    }
+    .hero-image-container img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-upload-btn {
+      position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.65); color: white;
+      padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; backdrop-filter: blur(4px);
+    }
+
+    /* Cornice QR Code */
+    .qr-frame-container {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px; background: linear-gradient(180deg, #e0f2fe 0%, #ffffff 100%);
+      border-radius: 24px; border: 3px dashed #0284c7; box-shadow: var(--shadow); margin: 20px 0;
+    }
+    .marine-silhouettes { display: flex; justify-content: space-between; width: 100%; max-width: 280px; font-size: 1.5rem; opacity: 0.8; margin: 8px 0; }
+    .qr-box { background: white; padding: 14px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 2px solid #38bdf8; }
+    .qr-box img { width: 200px; height: 200px; display: block; border-radius: 8px; }
+
+    /* SOS & Buttons */
+    .action-card-danger {
+      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      border: 1px solid #fca5a5; border-radius: var(--radius); padding: 18px; margin-bottom: 16px; cursor: pointer;
+    }
+    .action-card-danger h3 { color: var(--danger-dark); }
+
+    .sos-btn {
+      background: var(--danger); color: white; border: none; padding: 12px; border-radius: 12px;
+      font-weight: 800; font-size: 1rem; width: 100%; display: flex; align-items: center; justify-content: center;
+      gap: 8px; text-decoration: none; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Forms */
+    label { display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-top: 10px; margin-bottom: 4px; }
+    input, textarea, select {
+      width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; background: #f8fafc; outline: none;
+    }
+    button.submit-btn {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none; padding: 12px;
+      border-radius: 10px; width: 100%; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 14px;
+    }
+
+    /* Layout Scheda Specie con Foto */
+    .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; font-size: 0.95rem; }
+    .species-grid { display: flex; flex-direction: column; gap: 12px; }
+    
+    .species-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      gap: 10px;
+    }
+    .species-info { display: flex; flex-direction: column; flex: 1; }
+    .species-title { font-weight: 700; font-size: 0.95rem; color: #0f172a; }
+    .species-wiki-link { font-size: 0.78rem; color: var(--primary); text-decoration: none; margin-top: 4px; font-weight: 600; }
+    
+    .species-thumb-container {
+      width: 55px; height: 55px; border-radius: 10px; overflow: hidden;
+      background: var(--primary-light); display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; border: 1px solid #cbd5e1; font-size: 1.5rem;
+    }
+    .species-thumb-container img { width: 100%; height: 100%; object-fit: cover; }
+
+    .seen-btn {
+      background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px 12px;
+      border-radius: 20px; font-weight: 700; font-size: 0.8rem; color: #475569; cursor: pointer; white-space: nowrap;
+    }
+    .seen-btn.seen { background: #dcfce7; border-color: #86efac; color: #15803d; }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 8px 0 12px 0;
+      border-top: 1px solid var(--border); z-index: 1000;
+    }
+    .nav-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 0.7rem; font-weight: 600; flex: 1; cursor: pointer; }
+    .nav-btn.active { color: var(--primary); font-weight: 800; }
+    .nav-icon { font-size: 1.3rem; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- ELEMENTI GRAFICI DI SFONDO (BOLLE E ADESIVI) -->
+  <div class="bubbles-container">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+  <div class="sea-sticker sticker-1">🪸</div>
+  <div class="sea-sticker sticker-2">⭐</div>
+  <div class="sea-sticker sticker-3">🐚</div>
+  <div class="sea-sticker sticker-4">🐙</div>
+
+  <!-- MENU LATERALE OVERLAY -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-header">📌 Menu Navigazione</div>
+    <ul class="drawer-menu">
+      <li class="drawer-item" onclick="showPage('home'); toggleDrawer();">🏠 Home</li>
+      <li class="drawer-item" onclick="showPage('qrcode'); toggleDrawer();">🔲 QR Code Web App</li>
+      <li class="drawer-item" onclick="showPage('safety'); toggleDrawer();">🚨 Sicurezza & Schede SOS</li>
+      <li class="drawer-item" onclick="showPage('guide'); toggleDrawer();">🐟 Guida Specie Marine</li>
+      <li class="drawer-item" onclick="showPage('map'); toggleDrawer();">🗺️ Mappa & Centri Diving</li>
+      <li class="drawer-item" onclick="window.open('https://www.3bmeteo.com', '_blank'); toggleDrawer();">🌤️ Meteo & Mare (3BMeteo) ↗</li>
+      <li class="drawer-item" onclick="showPage('logbook'); toggleDrawer();">📖 Diario di Bordo</li>
+    </ul>
+  </aside>
+
+  <!-- TOP BAR -->
+  <header class="header">
+    <button class="menu-toggle" onclick="toggleDrawer()">☰</button>
+    <div class="brand">
+      <span>🤿 Y&C - I Sub del Golfo</span>
+    </div>
+    <div style="width: 24px;"></div>
+  </header>
+
+  <!-- HOME PAGE -->
+  <main id="home" class="page active">
+    <div class="hero-image-container" onclick="document.getElementById('hero-file-input').click()">
+      <img id="hero-banner-img" src="" alt="Copertina" style="display: none;">
+      <div id="hero-placeholder" style="color:white; text-align:center;">
+        <span style="font-size: 2rem;">📸</span><br>Premi per scegliere la copertina
+      </div>
+      <div class="hero-upload-btn">📷 Cambia Foto</div>
+    </div>
+    <input type="file" id="hero-file-input" accept="image/*" style="display: none" onchange="handleHeroImageUpload(event)">
+
+    <div class="action-card-danger" onclick="showPage('safety')">
+      <h3 style="font-size:1.1rem; margin-bottom:4px;">🚨 Sicurezza & Schede Dati SOS</h3>
+      <p style="color:#991b1b; font-size:0.88rem;">
+        Pulsanti d'emergenza rapida (Guardia Costiera 1530 / DAN) e schede sanitarie personali e dei compagni.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>🌊 Benvenuti a Bordo!</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-top:6px;">
+        Esplora i fondali del Golfo! Usa il menu in alto a sinistra (☰) per accedere alle specie marine, al meteo, alla mappa dei diving spot e al diario d'immersione.
+      </p>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--primary);">
+      <h4>🤿 Promemoria Sicurezza Sub</h4>
+      <p style="font-size:0.85rem; color:#475569; margin-top:4px;">
+        Pianifica sempre la tua immersione, rispetta i tempi di decompressione e controlla costantemente la scorta d'aria con il tuo compagno di coppia!
+      </p>
+    </div>
+  </main>
+
+  <!-- PAGINA QR CODE -->
+  <main id="qrcode" class="page">
+    <h2 class="page-title">🔲 QR Code Web App</h2>
+    <div class="card" style="text-align: center;">
+      <h3>Scansiona per Aprire il Sito</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
+        Mostra questo codice ai tuoi compagni di immersione per condividere l'app!
+      </p>
+
+      <div class="qr-frame-container">
+        <div class="marine-silhouettes">
+          <span>🐢</span><span>🐬</span><span>🐟</span><span>🐙</span><span>🦈</span>
+        </div>
+        <div class="qr-box">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://krdp6hydv5-oss.github.io/i-sub-del-golfo/" alt="QR Code Y&C I Sub del Golfo">
+        </div>
+        <div class="marine-silhouettes">
+          <span>🦈</span><span>🐙</span><span>🐟</span><span>🐬</span><span>🐢</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SICUREZZA & SOS -->
+  <main id="safety" class="page">
+    <h2 class="page-title">🚨 Sicurezza & Contatti SOS</h2>
+
+    <div class="card" style="border-color:#fca5a5; background:#fff5f5;">
+      <h3 style="color:#991b1b; margin-bottom:12px;">Numeri di Emergenza</h3>
+      <a href="tel:1530" class="sos-btn">📞 Chiamata Guardia Costiera (1530)</a>
+      <a href="tel:+390642118685" class="sos-btn" style="background:#0284c7;">🚑 Emergenza DAN Sub (+39 06 42118685)</a>
+    </div>
+
+    <div class="card">
+      <h3>➕ Aggiungi Scheda Dati / Carta d'Identità</h3>
+      <form id="profile-form">
+        <label for="prof-name">Nome e Cognome *</label>
+        <input type="text" id="prof-name" placeholder="Es. Mario Rossi" required>
+
+        <label for="prof-city">Città / Residenza</label>
+        <input type="text" id="prof-city" placeholder="Es. La Spezia">
+
+        <label for="prof-blood">Gruppo Sanguigno & Allergie</label>
+        <input type="text" id="prof-blood" placeholder="Es. 0+ / Allergico a Penicillina">
+
+        <label for="prof-cert">Brevetto Subacqueo & Livello</label>
+        <input type="text" id="prof-cert" placeholder="Es. Open Water Diver PADI">
+
+        <label for="prof-emergency">Contatto Primario di Soccorso (Nome & Tel)</label>
+        <input type="text" id="prof-emergency" placeholder="Es. Moglie - 333 1234567">
+
+        <label for="prof-notes">Altre Informazioni Mediche Utili</label>
+        <textarea id="prof-notes" rows="3" placeholder="Ipertensione, note per i soccorritori..."></textarea>
+
+        <button type="submit" class="submit-btn">Salva Scheda Dati</button>
+      </form>
+    </div>
+
+    <h3 style="margin: 20px 0 10px 0;">Schede Profilo Salvate</h3>
+    <div id="profiles-list"></div>
+  </main>
+
+  <!-- MAPPA & DIVING -->
+  <main id="map" class="page">
+    <h2 class="page-title">🗺️ Mappa & Centri Diving</h2>
+    <div class="card">
+      <h3>Mappa Interattiva</h3>
+      <iframe style="width:100%; height:260px; border:none; border-radius:12px; margin-bottom:10px;" src="https://maps.google.com/maps?q=Golfo%20dei%20Poeti%20diving&t=&z=12&ie=UTF8&iwloc=&output=embed"></iframe>
+      <p style="font-size:0.85rem; color:var(--text-muted);">Mappa dei principali diving spot nel golfo.</p>
+    </div>
+  </main>
+
+  <!-- SPECIE MARINE CON FOTO D'ANTEPRIMA -->
+  <main id="guide" class="page">
+    <h2 class="page-title">🐟 Specie Marine & Wikipedia</h2>
+    <input type="text" id="search-input" class="search-box" placeholder="Cerca specie..." onkeyup="filterSpecies()">
+    <div id="species-container" class="species-grid"></div>
+  </main>
+
+  <!-- DIARIO DI BORDO -->
+  <main id="logbook" class="page">
+    <h2 class="page-title">📖 Diario di Bordo</h2>
+    <div class="card">
+      <h3>Nuova Nota d'Immersione</h3>
+      <form id="dive-form">
+        <label for="dive-title">Punto Immersione</label>
+        <input type="text" id="dive-title" placeholder="Es. Secca del Faro" required>
+
+        <label for="dive-date">Data</label>
+        <input type="date" id="dive-date" required>
+
+        <label for="dive-notes">Note & Dettagli</label>
+        <textarea id="dive-notes" rows="3" placeholder="Profondità, visibilità, attrezzatura..." required></textarea>
+
+        <button type="submit" class="submit-btn">Salva Nota</button>
+      </form>
+    </div>
+    <h3 style="margin: 20px 0 10px 0;">Note Salvate</h3>
+    <div id="log-list"></div>
+  </main>
+
+  <!-- NAVIGATION BAR INFERIORE -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="btn-home" onclick="showPage('home')">
+      <span class="nav-icon">🏠</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" id="btn-safety" onclick="showPage('safety')">
+      <span class="nav-icon">🚨</span>
+      <span>Sicurezza</span>
+    </button>
+    <button class="nav-btn" id="btn-guide" onclick="showPage('guide')">
+      <span class="nav-icon">🐟</span>
+      <span>Specie</span>
+    </button>
+    <button class="nav-btn" id="btn-logbook" onclick="showPage('logbook')">
+      <span class="nav-icon">📖</span>
+      <span>Diario</span>
+    </button>
+  </nav>
+
+  <script>
+    const rawSpeciesList = [
+      "Aguglia", "Aragosta", "Bavosa", "Bavosa bianca", "Bavosa cornuta", "Bavosa gialla",
+      "Barracuda", "Boga", "Berta minore", "Cappone gallinella", "Caretta caretta", "Castagnola",
+      "Castagnola rossa", "Cavalluccio marino", "Cefalo", "Cernia bruna", "Cernia rossa", "Cepola",
+      "Civetta di mare", "Coccinella di mare", "Cormorano", "Corvina", "Delfino", "Donzella",
+      "Donzella pavonina", "Edredone", "Flabellina affinis", "Gabbiano reale", "Gallinella", "Ghiozzo",
+      "Ghiozzo rigato", "Gorgonia rossa", "Granchio eremita", "Granchio reale blu",
+      "Grongo", "Lampuga", "Leccia", "Lepre di mare", "Latterino",
+      "Mako", "Margherita di mare", "Medusa luminosa", "Mormora", "Mostella", "Murena", "Nasello",
+      "Occhiata", "Pagello bastardo", "Pagello fragolino", "Pagro", "Palamita", "Pesce balestra",
+      "Pesce civetta", "Pesce peperoncino", "Pesce serra", "Perchia", "Polpo", "Pomodoro di mare",
+      "Polmone di mare", "Rana pescatrice", "Razza", "Re di triglie", "Ricciola", "Rombo",
+      "Rombo di rena", "Salpa", "Sarago fasciato", "Sarago maggiore", "Sarago pizzuto", "Scorfano nero",
+      "Scorfano rosso", "Scorfanotto", "Seppia", "Sogliola", "Spigola", "Tanuta", "Torpedine",
+      "Tordo fischietto", "Tordo grigio", "Tordo mediterraneo", "Tordo musolungo", "Tordo nero",
+      "Tordo ocellato", "Tordo pavone", "Tordo verde", "Triglia di fango", "Triglia di scoglio",
+      "Vacchetta di mare", "Verdesca", "Verme dal ciuffo bianco", "Zerro"
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadHeroImage();
+      renderSpecies();
+      renderLogs();
+      renderProfiles();
+    });
+
+    function toggleDrawer() {
+      document.getElementById('drawer').classList.toggle('active');
+      document.getElementById('drawer-overlay').classList.toggle('active');
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      const targetPage = document.getElementById(pageId);
+      const targetBtn = document.getElementById('btn-' + pageId);
+
+      if (targetPage) targetPage.classList.add('active');
+      if (targetBtn) targetBtn.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function loadHeroImage() {
+      const savedImg = localStorage.getItem('sub_golfo_hero_image');
+      const imgElem = document.getElementById('hero-banner-img');
+      const placeholderElem = document.getElementById('hero-placeholder');
+
+      if (savedImg && imgElem) {
+        imgElem.src = savedImg; 
+        imgElem.style.display = 'block';
+        if (placeholderElem) placeholderElem.style.display = 'none';
+      }
+    }
+
+    function handleHeroImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxW = 800;
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          localStorage.setItem('sub_golfo_hero_image', canvas.toDataURL('image/jpeg', 0.8));
+          loadHeroImage();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const newProfile = {
+        name: document.getElementById('prof-name').value,
+        city: document.getElementById('prof-city').value,
+        blood: document.getElementById('prof-blood').value,
+        cert: document.getElementById('prof-cert').value,
+        emergency: document.getElementById('prof-emergency').value,
+        notes: document.getElementById('prof-notes').value
+      };
+
+      let profiles = JSON.parse(localStorage.getItem('app_sos_profiles') || '[]');
+      profiles.unshift(newProfile);
+      localStorage.setItem('app_sos_profiles', JSON.stringify(profiles));
+      this.reset();
+      renderProfiles();
+    });
+
+    function renderProfiles() {
+      const listEl = document.getElementById('profiles-list');
+      if (!listEl) return;
+      const profiles = JSON.parse(localStorage.getItem('app_sos_profiles') || '[]');
+
+      if (profiles.length === 0) {
+        listEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Nessuna scheda inserita.</p>';
+        return;
+      }
+
+      listEl.innerHTML = profiles.map((p, idx) => `
+        <div class="card" style="border-left: 4px solid var(--danger);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>👤 ${p.name}</h3>
+            <button onclick="deleteProfile(${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer;">🗑️ Elimina</button>
+          </div>
+          <p style="font-size:0.85rem; margin-top:6px;">📍 <strong>Città:</strong> ${p.city || '-'}</p>
+          <p style="font-size:0.85rem;">🩸 <strong>Gruppo/Allergie:</strong> ${p.blood || '-'}</p>
+          <p style="font-size:0.85rem;">🤿 <strong>Brevetto:</strong> ${p.cert || '-'}</p>
+          <p style="font-size:0.85rem;">📞 <strong>Soccorso:</strong> ${p.emergency || '-'}</p>
+          ${p.notes ? `<p style="font-size:0.85rem; margin-top:4px; color:#64748b;">📝 ${p.notes}</p>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function deleteProfile(index) {
+      let profiles = JSON.parse(localStorage.getItem('app_sos_profiles') || '[]');
+      profiles.splice(index, 1);
+      localStorage.setItem('app_sos_profiles', JSON.stringify(profiles));
+      renderProfiles();
+    }
+
+    function renderSpecies() {
+      const container = document.getElementById('species-container');
+      if (!container) return;
+      let seenData = JSON.parse(localStorage.getItem('seen_species_v2') || '{}');
+
+      container.innerHTML = rawSpeciesList.map((name, idx) => {
+        const isSeen = !!seenData[name];
+        const wikiUrl = `https://it.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(name)}`;
+
+        return `
+          <div class="species-card" data-name="${name.toLowerCase()}">
+            <div class="species-info">
+              <span class="species-title">${name}</span>
+              <a href="${wikiUrl}" target="_blank" class="species-wiki-link">📖 Wikipedia ↗</a>
+            </div>
+
+            <div class="species-thumb-container">
+              🐟
+            </div>
+
+            <button class="seen-btn ${isSeen ? 'seen' : ''}" onclick="toggleSeen(${idx})">
+              ${isSeen ? '✓ Visto' : '+ Visto'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSeen(index) {
+      const name = rawSpeciesList[index];
+      let seenData = JSON.parse(localStorage.getItem('seen_species_v2') || '{}');
+      seenData[name] = !seenData[name];
+      localStorage.setItem('seen_species_v2', JSON.stringify(seenData));
+      renderSpecies();
+    }
+
+    function filterSpecies() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      document.querySelectorAll('.species-card').forEach(item => {
+        item.style.display = item.getAttribute('data-name').includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    document.getElementById('dive-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let logs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+      logs.unshift({ title: document.getElementById('dive-title').value, date: document.getElementById('dive-date').value, notes: document.getElementById('dive-notes').value });
+      localStorage.setItem('app_logs', JSON.stringify(logs));
+      this.reset();
+      renderLogs();
+    });
+
+    function renderLogs() {
+      const logEl = document.getElementById('log-list');
+      if (!logEl) return;
+      let logs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+      logEl.innerHTML = logs.map(l => `<div class="card"><h3>${l.title}</h3><p style="font-size:0.8rem; color:var(--primary);">📅 ${l.date}</p><p>${l.notes}</p></div>`).join('');
+    }
+  </script>
+</body>
+</html>
